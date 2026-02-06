@@ -3,7 +3,7 @@ extends Node2D
 var hp: int = 600
 var grid_pos: Vector2i = Vector2i.ZERO
 
-# Dirección del último movimiento (se usa para disparar).
+# Dirección del último movimiento (se usa para disparar).S
 # Por defecto: derecha
 var last_dir: Vector2i = Vector2i(0, 1)
 

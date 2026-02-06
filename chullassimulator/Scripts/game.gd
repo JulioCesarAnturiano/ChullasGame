@@ -1,5 +1,3 @@
-# game.gd (Godot 4.x)
-# Pega Este Script Completo En El Nodo "Game" (Node2D)
 
 extends Node2D
 
@@ -7,9 +5,7 @@ extends Node2D
 @export var cols: int = 9
 @export var cell_size: int = 48
 
-# Arrastra Tus Escenas Aquí Desde El Inspector:
-# - res://scenes/chulla.tscn
-# - res://scenes/wall.tscn
+
 @export var chulla_scene: PackedScene
 @export var wall_scene: PackedScene
 
@@ -18,15 +14,15 @@ extends Node2D
 @onready var turn_label: Label = $UI/Label
 @onready var info_label: Label = $UI/Label2
 
-# Matriz Lógica: grid[r][c] = Nodo (Chulla/Wall) o null
+
 var grid: Array = []
 
-# Turnos
+
 var current_player: int = 0
-var chullas: Array = [] # [chulla1, chulla2]
+var chullas: Array = [] 
 var game_over: bool = false
-var last_dir: Vector2i = Vector2i(0, 1) # Dirección por defecto (derecha)
-var damage_projectile: int = 200        # Daño base
+var last_dir: Vector2i = Vector2i(0, 1) 
+var damage_projectile: int = 200        
 
 
 func _ready() -> void:
@@ -229,7 +225,7 @@ func _apply_damage_to_target(target: Node) -> void:
 	# - Wall: daño completo
 	# - Chulla: daño a la mitad
 	var dmg: int = damage_projectile
-	# Identificar Chulla sin has_variable (Godot 4)
+	
 	var is_chulla: bool = target.has_method("set_last_dir")
 	if is_chulla:
 		dmg = dmg / 2
