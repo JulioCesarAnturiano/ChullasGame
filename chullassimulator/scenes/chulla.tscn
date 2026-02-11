@@ -1,14 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://tyl3etkrdsy6"]
+[gd_scene load_steps=3 format=3 uid="uid://tyl3etkrdsy6"]
 
-[ext_resource type="Script" uid="uid://t57gtghxrhh6" path="res://Scripts/chulla.gd" id="1_62al5"]
+[ext_resource type="Script" path="res://Scripts/chulla.gd" id="1_62al5"]
+[ext_resource type="Texture2D" uid="uid://brvhei622m34o" path="res://ChullaSprites/Chulla_rojo.png" id="2_q43sb"]
 
 [node name="Chulla" type="Node2D"]
 script = ExtResource("1_62al5")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-offset_top = 1.0
-offset_right = 48.0
-offset_bottom = 49.0
-color = Color(0.994476, 0, 0.129394, 1)
-
 [node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_q43sb")

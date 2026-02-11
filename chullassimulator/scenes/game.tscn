@@ -1,13 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://b1htsj06bpysw"]
+[gd_scene load_steps=5 format=3 uid="uid://b1htsj06bpysw"]
 
 [ext_resource type="Script" path="res://Scripts/game.gd" id="1_uwrxv"]
 [ext_resource type="PackedScene" uid="uid://tyl3etkrdsy6" path="res://scenes/chulla.tscn" id="2_lnu2h"]
 [ext_resource type="PackedScene" uid="uid://df4y4slvc1vcy" path="res://scenes/wall.tscn" id="3_lbhrr"]
+[ext_resource type="Texture2D" uid="uid://7d7xopuirkb" path="res://ChullaSprites/Suelo normal.png" id="4_pwwil"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
 chulla_scene = ExtResource("2_lnu2h")
 wall_scene = ExtResource("3_lbhrr")
+floor_texture = ExtResource("4_pwwil")
 
 [node name="Board" type="Node2D" parent="."]
 

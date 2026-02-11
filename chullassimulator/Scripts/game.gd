@@ -13,6 +13,10 @@ extends Node2D
 @onready var board: Node2D = $Board
 @onready var turn_label: Label = $UI/Label
 @onready var info_label: Label = $UI/Label2
+@export var floor_texture: Texture2D
+@export var bullet_scene: PackedScene
+@export var bullet_texture: Texture2D
+
 
 
 var grid: Array = []
@@ -26,11 +30,8 @@ var damage_projectile: int = 200
 
 
 func _ready() -> void:
-	print("READY: Game Iniciado")
-	print("chulla_scene =", chulla_scene)
-	print("wall_scene =", wall_scene)
-	print("Entities Node =", entities)
 	_init_grid()
+	_draw_floor()
 	_setup_level()
 	_update_ui()
 
@@ -46,6 +47,22 @@ func _init_grid() -> void:
 		for c in range(cols):
 			row_arr[c] = null
 		grid.append(row_arr)
+
+func _draw_floor() -> void:
+	# Limpia el Board
+	for child in board.get_children():
+		child.queue_free()
+
+	if floor_texture == null:
+		return
+
+	for r in range(rows):
+		for c in range(cols):
+			var s := Sprite2D.new()
+			s.texture = floor_texture
+			s.centered = false
+			s.position = Vector2(c * cell_size, r * cell_size)
+			board.add_child(s)
 
 
 # -------------------------
@@ -156,6 +173,43 @@ func _unhandled_input(event: InputEvent) -> void:
 	if chullas.size() < 2:
 		return
 
+	var chulla: Node2D = chullas[current_player] as Node2D
+
+	# Flechas: solo apuntar (no mover)
+	if event.is_action_pressed("ui_up"):
+		last_dir = Vector2i(-1, 0)
+		chulla.call("set_aim", last_dir)
+		return
+	elif event.is_action_pressed("ui_down"):
+		last_dir = Vector2i(1, 0)
+		chulla.call("set_aim", last_dir)
+		return
+	elif event.is_action_pressed("ui_left"):
+		last_dir = Vector2i(0, -1)
+		chulla.call("set_aim", last_dir)
+		return
+	elif event.is_action_pressed("ui_right"):
+		last_dir = Vector2i(0, 1)
+		chulla.call("set_aim", last_dir)
+		return
+
+	# M + flecha: mover (una acción por turno)
+	if event.is_action_pressed("move"):
+		# Mueve en la dirección donde está apuntando
+		move_current(last_dir)
+		end_turn()
+		return
+
+	# Space: disparar
+	if event.is_action_pressed("shoot"):
+		shoot_current()
+		return
+
+	if game_over:
+		return
+	if chullas.size() < 2:
+		return
+
 	if event.is_action_pressed("ui_up"):
 		last_dir = Vector2i(-1, 0)
 		move_current(last_dir)
@@ -201,24 +255,48 @@ func move_current(dir: Vector2i) -> void:
 func shoot_current() -> void:
 	if chullas.size() < 2:
 		return
+
 	var shooter: Node2D = chullas[current_player] as Node2D
 	var start_cell: Vector2i = shooter.get("grid_pos") as Vector2i
-	# Empieza en la celda de adelante
 	var cell: Vector2i = start_cell + last_dir
+
+	# Crear bala visual
+	var bullet: Node2D = null
+	if bullet_scene != null:
+		bullet = bullet_scene.instantiate() as Node2D
+		entities.add_child(bullet)
+		bullet.position = shooter.position
+		if bullet.has_method("set_texture"):
+			bullet.call("set_texture", bullet_texture)
+
 	while is_inside(cell):
+		var next_pos := board_to_world(cell)
+
+		# Mover bala visual a la siguiente celda
+		if bullet != null and bullet.has_method("fly_to"):
+			await bullet.call("fly_to", next_pos)
+
 		var target: Variant = get_at(cell)
-		# Si está vacío, sigue avanzando
+
 		if target == null:
 			cell += last_dir
 			continue
-		# Si choca con algo (muro o chulla), aplica daño y se detiene
-		_apply_damage_to_target(target)
+
+		_apply_damage_to_target(target as Node)
 		_update_ui()
 		_check_game_over()
+
+		if bullet != null:
+			bullet.queue_free()
+
 		end_turn()
 		return
-	# Si no golpeó nada, igual termina turno (como disparo al vacío)
+
+	# No golpeó nada
+	if bullet != null:
+		bullet.queue_free()
 	end_turn()
+
 
 func _apply_damage_to_target(target: Node) -> void:
 	# Reglas:
